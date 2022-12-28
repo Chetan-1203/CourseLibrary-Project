@@ -4,6 +4,7 @@ using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,12 +25,12 @@ namespace CourseLibrary.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           services.AddControllers(setUpAction =>
-           {
-               setUpAction.ReturnHttpNotAcceptable = true;
-               
-           }).AddXmlDataContractSerializerFormatters();
-             
+            services.AddControllers(setUpAction =>
+            {
+                setUpAction.ReturnHttpNotAcceptable = true;
+
+            }).AddXmlDataContractSerializerFormatters();
+            
             services.AddScoped<ICourseLibraryRepository, CourseLibraryRepository>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

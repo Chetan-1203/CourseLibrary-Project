@@ -18,6 +18,6 @@ namespace CourseL.api.Model
        
         public string MainCategory { get; set; }
 
-        public ICollection<CourseForCreationForDto> Courses { get; set; }= new List<CourseForCreationForDto>(); 
+        public ICollection<CourseForCreationDto> Courses { get; set; }= new List<CourseForCreationDto>(); 
     }
 }

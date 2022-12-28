@@ -2,20 +2,16 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System;
+using System.Collections.Generic;
+using CourseL.api.ValidationAttributes;
 
 namespace CourseL.api.Model
 {
-    public class CourseForCreationForDto
+    
+    public class CourseForCreationDto :CourseForManipulationDto
     {
-       
 
-      
-        public string Title { get; set; }
-
-      
-        public string Description { get; set; }
 
        
-        
     }
 }
