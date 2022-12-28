@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CourseL.api.Model;
 
 namespace CourseL.api.Profiles
 {
@@ -7,6 +8,7 @@ namespace CourseL.api.Profiles
         public CourseProfile()
         {
             CreateMap<Entities.Course, Model.CourseDto>();
+            CreateMap<Model.CourseForCreationForDto, Entities.Course>();
         }
     }
 }
