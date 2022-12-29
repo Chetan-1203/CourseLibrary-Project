@@ -96,7 +96,12 @@ namespace CourseL.api.Controllers
         {
             if (!_courseLibraryRepository.AuthorExists(authorId))
             {
-                return NotFound();
+                var courseDto = new CourseForUpdateDto();
+                patchDocument.ApplyTo(courseDto);
+                var courseToAdd = _mapper.Map<Entities.Course>(courseDto);
+                courseToAdd.Id =courseId;
+                _courseLibraryRepository.AddCourse(authorId, courseToAdd);
+                _courseLibraryRepository.Save();
             }
 
             var courseForAuthorRepo = _courseLibraryRepository.GetCourse(authorId, courseId);
@@ -107,8 +112,37 @@ namespace CourseL.api.Controllers
             }
             var courseToPatch = _mapper.Map<CourseForUpdateDto>(courseForAuthorRepo);
             patchDocument.ApplyTo(courseToPatch);
+          
+            _mapper.Map(courseToPatch, courseForAuthorRepo);
+            _courseLibraryRepository.UpdateCourse(courseForAuthorRepo);
+            _courseLibraryRepository.Save();
 
             return NoContent();
         }
+
+        [HttpDelete("{courseId}")]
+
+        public ActionResult DeleteCourseForAuthor(Guid authorId , Guid courseId)
+        {
+
+            if (!_courseLibraryRepository.AuthorExists(authorId))
+            {
+                return NotFound();
+            }
+            var courseForAuthorRepo = _courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if(courseForAuthorRepo == null)
+            {
+                return NotFound();
+            }
+
+            _courseLibraryRepository.DeleteCourse(courseForAuthorRepo);
+            _courseLibraryRepository.Save();
+
+            return NoContent();
+
+        }
+       
+            
     }
 }
