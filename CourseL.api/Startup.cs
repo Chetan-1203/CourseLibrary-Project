@@ -4,13 +4,16 @@ using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-
+using System.IO;
+using System.Reflection;
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace CourseLibrary.API
 {
     public class Startup
@@ -34,6 +37,20 @@ namespace CourseLibrary.API
             services.AddScoped<ICourseLibraryRepository, CourseLibraryRepository>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddSwaggerGen(setupAction =>
+            {
+                setupAction.SwaggerDoc("LibraryOpenAPISpecification",
+                    new Microsoft.OpenApi.Models.OpenApiInfo()
+                    {
+                        Title = "Library API",
+                        Version = "1"
+                    });
+               // var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+               // var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+               // setupAction.IncludeXmlComments(xmlCommentsFullPath);
+            });
 
             services.AddDbContext<CourseLibraryContext>(options =>
             {
@@ -61,7 +78,13 @@ namespace CourseLibrary.API
                 });
             }
             app.UseRouting();
+            app.UseSwagger();
 
+            app.UseSwaggerUI(setUpAction =>
+            {
+                setUpAction.SwaggerEndpoint("/swagger/LibraryOpenAPISpecification/swagger.json", "Library API");
+                setUpAction.RoutePrefix = "";
+            });
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

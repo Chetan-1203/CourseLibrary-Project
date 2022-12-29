@@ -24,11 +24,18 @@ namespace CourseL.api.Controllers
 
         [HttpGet()]
         [HttpHead]
+        
         public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery]AuthorsResourceParameters authorsResourceParameters)
         {
             var authorsFromRepo = _courseLibraryRepository.GetAuthors(authorsResourceParameters);
             return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo));
         }
+        
+        /// <summary>
+        /// get authors
+        /// </summary>
+        /// <param name="authorId"></param>
+        /// <returns></returns>
         [HttpGet("{authorId:guid}", Name ="GetAuthor")]
         public IActionResult GetAuthor(Guid authorId)
         {

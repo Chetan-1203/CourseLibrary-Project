@@ -48,7 +48,7 @@ namespace CourseL.api.Controllers
             return Ok(_mapper.Map<CourseDto>(courseforAuthorFromRepo));
 
         }
-
+        [HttpPost]
         public ActionResult<CourseDto> CreateCourseForAuthor(Guid authorId, CourseForCreationDto course)
         {
             if (!_courseLibraryRepository.AuthorExists(authorId))
