@@ -22,7 +22,11 @@ namespace CourseL.api.Controllers
         }
        
 
-
+        /// <summary>
+        ///  creation of collection of author
+        /// </summary>
+        /// <param name="authorCollection"></param>
+        /// <returns></returns>
 
         [HttpPost]
         public ActionResult<IEnumerable<AuthorDto>> CreateAuthorCollection(IEnumerable<AuthorForCreationDto> authorCollection)

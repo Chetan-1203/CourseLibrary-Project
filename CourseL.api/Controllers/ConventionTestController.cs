@@ -7,7 +7,7 @@ namespace CourseL.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-  //  [ApiConventionType(typeof(DefaultApiConventions))]
+   // [ApiConventionType(typeof(DefaultApiConventions))]
     public class ConventionTestController : ControllerBase
     {
         // GET: api/<ConventionTestController>
