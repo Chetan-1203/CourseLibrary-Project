@@ -50,6 +50,7 @@ namespace CourseL.api.Controllers
         
         public IActionResult GetAuthor(Guid authorId)
         {
+            
             var authorsFromRepo = _courseLibraryRepository.GetAuthor(authorId);
             if (authorsFromRepo==null)
             {
@@ -59,11 +60,14 @@ namespace CourseL.api.Controllers
            
             return Ok(_mapper.Map<AuthorDto>(authorsFromRepo));
         }
+
+        
         /// <summary>
         /// creates a new author
         /// </summary>
         /// <param name="author"></param>
         /// <returns></returns>
+        /// 
         [HttpPost]
         public ActionResult<AuthorDto> CreateAuthor(AuthorForCreationDto author)
         {

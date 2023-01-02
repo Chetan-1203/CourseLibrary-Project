@@ -1,18 +1,23 @@
 using AutoMapper;
+using CourseL.api.Authentication;
 using CourseLibrary.API.DbContexts;
 using CourseLibrary.API.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
@@ -32,9 +37,13 @@ namespace CourseLibrary.API
         {
             services.AddMvc(setupAction =>
             {
-               /* setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status400BadRequest));
+                setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status400BadRequest));
                 setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable));
-                setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));*/
+                setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
+                setupAction.Filters.Add(new ProducesDefaultResponseTypeAttribute());
+                setupAction.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized));
+
+                setupAction.Filters.Add(new AuthorizeFilter());
             });
             services.AddControllers(setUpAction =>
             {
@@ -45,6 +54,8 @@ namespace CourseLibrary.API
             services.AddScoped<ICourseLibraryRepository, CourseLibraryRepository>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddAuthentication("Basic")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
 
             services.AddSwaggerGen(setupAction =>
             {
@@ -63,7 +74,27 @@ namespace CourseLibrary.API
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 setupAction.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
+                setupAction.AddSecurityDefinition("basicAuth", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "basic",
+                    Description = "Input your username  and password in API"
+                });
+                setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type =ReferenceType.SecurityScheme,
+                                Id ="basicAuth"
+                            }
+                        },new List<string>()
+                    }
+                });
             });
+            
 
             services.AddDbContext<CourseLibraryContext>(options =>
             {
@@ -85,7 +116,14 @@ namespace CourseLibrary.API
                     options.SwaggerEndpoint("/swagger/CourseLibraryAPIAuthors/swagger.json", "CourseL Api(Authors)");
                     options.SwaggerEndpoint("/swagger/CourseLibraryAPICourses/swagger.json", "CourseL Api(Courses)");
                     options.RoutePrefix = string.Empty;
+                    options.DefaultModelExpandDepth(2);
+                    options.DefaultModelRendering(Swashbuckle.AspNetCore.SwaggerUI.ModelRendering.Model);
+                    options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+                    options.EnableDeepLinking();
+                    options.DisplayOperationId();
                 });
+                
+
             }
             else
             {
@@ -98,14 +136,16 @@ namespace CourseLibrary.API
                     });
                 });
             }
+            app.UseAuthentication();
             app.UseRouting();
-            
+           
             app.UseAuthorization();
-
+           
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+         
         }
 
         
